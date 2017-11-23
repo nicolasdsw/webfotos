@@ -2,6 +2,7 @@
 class DB {
 
     private $database;
+    public $databaseOk =  false;
     public $transactionOpen = false;
 
     public function __construct($user, $password, $dbName, $dbServer = 'localhost') {
@@ -10,7 +11,7 @@ class DB {
             $this->database = new PDO($str, $user, $password);
             $this->database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            print "Ocorreu um erro de conexão: " . $e->getMessage();
+            throw $e;
         }
     }
 

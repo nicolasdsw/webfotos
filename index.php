@@ -21,16 +21,25 @@
             <?php 
                 $usuarioLogin = $_SESSION["login"];
                 echo "<br>Olá, ".$usuarioLogin;
-            } else if ($menu != "novo-usuario"){
-                $menu = "login";
             }
             ?>
         </header>
         <main style="margin-left: 6%; margin-right: 6%;">
         <?php
-            try {
+            try {                
+                if ($menu == NULL && !isset($_SESSION["login"])) {
+                    require_once  'controller/ValidaDatabaseController.php';
+                    $controller = new ValidaDatabaseController();
+                   try {
+                       $controller->validaDB();
+                       $menu = "login";
+                   } catch (Exception $e) {
+                       echo "Verifique o usuário, a senha e o endereço de acesso do banco de dados em db/DBconfig.php <br>";
+                       print htmlentities($e->getMessage());
+                   }           
+                }
                 if ( $menu == NULL) {
-
+                   
                 } elseif ( $menu == 'login' ) {
                     require_once 'controller/AuthController.php';
                     $controller = new AuthController();
@@ -51,7 +60,7 @@
                     echo "Page not found ".$menu." was not found!";
                 }
             } catch ( Exception $e ) {
-                $this->showError("Application error", $e->getMessage());
+                print htmlentities($e->getMessage());
             }
         ?>
         </main>

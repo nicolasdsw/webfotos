@@ -3,7 +3,7 @@ Total de registros: <?php print count($lista); ?>
 <table class="mytable login" border="0" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            <th><a href="?menu=usuarios&orderby=login&dir=<?php print $dir * -1; ?>">Nome</a></th>
+            <th><a href="?menu=usuarios&orderby=login&dir=<?php print $dir * -1; ?>">Login</a></th>
             <th><a href="?menu=usuarios&orderby=email&dir=<?php print $dir * -1; ?>">E-mail</a></th>
             <th>&nbsp;</th>
         </tr>
