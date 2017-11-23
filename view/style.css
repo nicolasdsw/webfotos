@@ -1,0 +1,28 @@
+table.mytable {
+    width: 100%;
+}
+
+table.mytable thead {
+    background-color: #eee;
+    text-align: left;
+}
+
+table.mytable thead th {
+    border: solid 1px #fff;
+    padding: 3px;
+}
+
+table.mytable tbody td {
+    border: solid 1px #eee;
+    padding: 3px;
+}
+
+a, a:hover, a:active, a:visited {
+    color: blue;
+    text-decoration: underline;
+}
+
+#loginPage {
+	text-align: center;
+	margin: auto;
+}
