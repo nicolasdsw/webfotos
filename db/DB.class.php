@@ -10,6 +10,7 @@ class DB {
         try {
             $this->database = new PDO($str, $user, $password);
             $this->database->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->database->setAttribute( PDO::ATTR_EMULATE_PREPARES, false );
         } catch (PDOException $e) {
             throw $e;
         }

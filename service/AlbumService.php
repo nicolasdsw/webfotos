@@ -17,6 +17,11 @@ class AlbumService {
     }
 
     public function getAll($order, $direction) {
+        $userId = $_SESSION["user_id"];
+        return $this->getByUserId($userId, $order, $direction);
+    }
+
+    public function getByUserId($userId, $order, $direction) {
         try {
             if (!isset($order) || $order == NULL) {
                 $order = $this->primaryKey;
@@ -25,7 +30,7 @@ class AlbumService {
                 $direction = "ASC";
             }
             $list = array();
-            $res = $this->db->preparedQuery("SELECT * FROM $this->table ORDER BY $order $direction;", NULL);
+            $res = $this->db->preparedQuery("SELECT * FROM $this->table WHERE id_user=? ORDER BY $order $direction;", array($userId));
             foreach ($res as $row) {
                 $obj = new $this->model($row);
                 array_push($list, $obj);
@@ -41,21 +46,6 @@ class AlbumService {
             $parameters = array();
             array_push($parameters, $id);
             $res = $this->db->preparedQuery("SELECT * FROM $this->table WHERE ".$this->primaryKey."=?", $parameters);
-            $obj = NULL;
-            foreach ($res as $row) {
-                $obj = new $this->model($row);
-            }
-            return $obj;
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
-    public function getByUserId($userId) {
-        try {
-            $parameters = array();
-            array_push($parameters, $userId);
-            $res = $this->db->preparedQuery("SELECT * FROM $this->table WHERE id_user=?", $parameters);
             $obj = NULL;
             foreach ($res as $row) {
                 $obj = new $this->model($row);
@@ -83,15 +73,22 @@ class AlbumService {
         }
     }
     
-    public function getImage( $albumId ) {
-    	$stmt = $this->db->prepare("SELECT image from $this->table where $this->primaryKey=?");
+    public function getImage( $albumId ) {        
+        $name = null;
+        $lob = null;
+        $image_type = null;
+    	$stmt = $this->db->prepare("SELECT name, image, image_type from ".$this->table." where ".$this->primaryKey."=?");
     	$stmt->execute(array($albumId));
-    	$stmt->bindColumn(1, $lob, PDO::PARAM_LOB);
-    	//$stmt->bindColumn(2, $type, PDO::PARAM_STR, 256);
+    	$stmt->bindColumn(1, $name, PDO::PARAM_STR, 256);
+    	$stmt->bindColumn(2, $lob, PDO::PARAM_LOB);
+    	$stmt->bindColumn(3, $type, PDO::PARAM_STR, 256);
     	$stmt->fetch(PDO::FETCH_BOUND);    	
-    	//header("Content-Type: $type");
-    	header("Content-type: image/jpeg");
-    	fpassthru($lob);
+    	header("Content-type: $type");
+    	if (is_string($lob)) {   	    
+    	    echo $lob;
+    	} else {    	    
+    	    fpassthru($lob); 
+    	}    	
     }
     
     public function save( $obj ) {
@@ -100,7 +97,6 @@ class AlbumService {
             $parameters = array();
             $parameters['name'] = $obj->name;
             $parameters['description'] = $obj->description;
-            //$parameters['image'] = $obj->image;
             $parameters['id_user'] = $obj->id_user;
             $where = $this->primaryKey."=".$obj->id; 
             $res = NULL;
@@ -121,10 +117,17 @@ class AlbumService {
                 }
                 $this->db->commit();
             }
-            if ($obj->image != NULL) {            	
-            	$stmt = $this->db->prepare("UPDATE $this->table SET image=? WHERE $this->primaryKey=?");
-            	$stmt->bindParam(1, $obj->image, PDO::PARAM_LOB);    
-            	$stmt->bindParam(2, $obj->id);
+            
+            $pathToFile = $obj->imageTemp['tmp_name'];
+            if ($pathToFile != NULL) {                
+                $nome = $obj->imageTemp["name"];
+                $tamanho = $obj->imageTemp["size"];
+                $tipo    = $obj->imageTemp["type"];
+                $conteudo = file_get_contents($pathToFile);
+                $stmt = $this->db->prepare("UPDATE $this->table SET image=:image, image_type=:tipo WHERE $this->primaryKey=:id;");
+                $stmt->bindParam(':image', $conteudo, PDO::PARAM_LOB);    
+                $stmt->bindParam(':tipo', $tipo, PDO::PARAM_STR, 256);    
+            	$stmt->bindParam(':id', $obj->id);
 	            $stmt->execute();	
             }            
 	        return $res;
@@ -168,6 +171,15 @@ class AlbumService {
         }
         if (isEmpty($obj->name)) {
             $errors[] = 'Campo nome deve ser informado';
+        }
+
+        $pathToFile = $obj->imageTemp['tmp_name'];
+        if ($pathToFile != NULL) {
+            $file_type = $obj->imageTemp["type"];
+            $allowed = array("image/jpeg", "image/gif", "image/png");
+            if(!in_array($file_type, $allowed)) {
+                $errors[] = 'Apenas jpg, gif, and png são permitidos na capa do álbum.';
+            }           
         }
 
         $obj->id_user = $_SESSION["user_id"];

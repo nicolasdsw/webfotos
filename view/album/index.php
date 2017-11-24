@@ -19,17 +19,17 @@ if ( $errors ) {
     <br/>
     <br/>
     <label for="image">Imagem:</label>
-	<input type="file" name="image"/><br>
-	<?php 
-	if ($obj->image != NULL) {
-		echo '<img style="height: 100px;" src="imageView.php?album-id='.$obj->id.'"/>';
-	}
-	?>
+	<input type="file" name="fileUpload"/><br>
     <br>
     <input type="hidden" name="form-submitted" value="1" />
     <input type="submit" value="Salvar" />
     <input type="button" value="Limpar" onClick="self.location='index.php?menu=<?php print htmlentities($menu) ?>'" />
-    <input type="button" value="Voltar para o Início" onClick="self.location='index.php'" />
+    <input type="button" value="Voltar para o Início" onClick="self.location='index.php'" /><br>
+	<?php 
+	if ($obj->id != NULL) {
+		echo '<img style="height: 100px;" src="albumGetImage.php?album-id='.$obj->id.'"/>';
+	}
+	?>
 </form>
 
 <br></br>

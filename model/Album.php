@@ -4,6 +4,8 @@ class Album {
 	public $name;
 	public $description;
 	public $image;
+	public $image_type;
+	public $imageTemp;
 	public $id_user;
 
 	public function __construct($row) {

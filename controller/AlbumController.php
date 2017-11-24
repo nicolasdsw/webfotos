@@ -22,13 +22,6 @@ class AlbumController {
         try {
             if ( !$op || $op == 'show' || $op == 'new' || $op == 'save' ) {
                 $this->main();
-            } else if ($op == 'get-image') {
-                $id = $_GET['album-id'];
-                if(isset($id)) {
-                    $obj = $this->service->getById($id);
-                    //header("Content-type: image/jpg");
-                    echo $obj->image;
-                }
             } else {
                 $this->showError("Page not found", "Page for operation ".$op." was not found!");
             }
@@ -76,41 +69,7 @@ class AlbumController {
             $obj->id    = isset($_POST['id'])      ?   $_POST['id']  : NULL;
             $obj->name = isset($_POST['name'])   ?   $_POST['name'] : NULL;
             $obj->description = isset($_POST['description'])   ?   $_POST['description'] : NULL;
-             
-           /*  $imagem = $_FILES["image"];
-            if($imagem != NULL) {
-                $nomeFinal = time().'.jpg';
-                if (move_uploaded_file($imagem['tmp_name'], $nomeFinal)) {
-                    $tamanhoImg = filesize($nomeFinal);
-                    $mysqlImg = addslashes(fread(fopen($nomeFinal, "r"), $tamanhoImg));
-                    $obj->image = $mysqlImg;
-                }
-            }
-            else {
-                echo"Você não realizou o upload de forma satisfatória.";
-            } */ 
-            
-//             $check = getimagesize($_FILES["image"]["tmp_name"]);
-//             if($check !== false){
-//                 $image = $_FILES['image']['tmp_name'];
-//                 $imgContent = addslashes(file_get_contents($image));
-//                 $tamanhoImg = filesize($image);
-//                 $obj->image = $imgContent;
-//             }
-
-            $arquivo = $_FILES["image"]["tmp_name"];
-            $tamanho = $_FILES["image"]["size"];
-            $tipo    = $_FILES["image"]["type"];
-            $nome  	 = $_FILES["image"]["name"];
-            $conteudo = NULL;
-            if ( $arquivo != "none" ) {
-            	$fp = fopen($arquivo, "rb");
-            	$conteudo = fread($fp, $tamanho);
-            	$conteudo = addslashes($conteudo);
-           	 	fclose($fp); 
-            }	
-            $obj->image = $conteudo;
-           
+            $obj->imageTemp = $_FILES["fileUpload"];
             try {
                 $res = $this->service->save($obj);
                 echo "<br>";

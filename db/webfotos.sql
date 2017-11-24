@@ -20,7 +20,8 @@ CREATE TABLE albums
 	id_album bigint NOT NULL AUTO_INCREMENT,
 	name varchar(50) NOT NULL,
 	description text,
-	image blob,
+	image longblob,
+	image_type varchar(20),
 	id_user bigint NOT NULL,
 	PRIMARY KEY (id_album)
 );
