@@ -37,6 +37,14 @@ class DB {
             return $this->database->commit();
         }
     }
+    
+    public function prepare($sql) {
+    	try {
+    		return $this->database->prepare($sql);
+    	} catch (PDOException $exception) {
+    		echo '<pre>'.$exception->getMessage().$sql.'</pre>';
+    	}
+    }
 
     public function preparedQuery($sql, $data) {
         try {

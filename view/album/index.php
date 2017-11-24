@@ -21,7 +21,9 @@ if ( $errors ) {
     <label for="image">Imagem:</label>
 	<input type="file" name="image"/><br>
 	<?php 
-	echo '<img style="height: 100px;" src="data:image/jpg;base64,'.base64_encode($obj->image).'"/>';
+	if ($obj->image != NULL) {
+		echo '<img style="height: 100px;" src="imageView.php?album-id='.$obj->id.'"/>';
+	}
 	?>
     <br>
     <input type="hidden" name="form-submitted" value="1" />

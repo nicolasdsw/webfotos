@@ -83,15 +83,27 @@ class AlbumService {
         }
     }
     
+    public function getImage( $albumId ) {
+    	$stmt = $this->db->prepare("SELECT image from $this->table where $this->primaryKey=?");
+    	$stmt->execute(array($albumId));
+    	$stmt->bindColumn(1, $lob, PDO::PARAM_LOB);
+    	//$stmt->bindColumn(2, $type, PDO::PARAM_STR, 256);
+    	$stmt->fetch(PDO::FETCH_BOUND);    	
+    	//header("Content-Type: $type");
+    	header("Content-type: image/jpeg");
+    	fpassthru($lob);
+    }
+    
     public function save( $obj ) {
         if ($obj != NULL ) {
             $this->beforeSave($obj); 
             $parameters = array();
             $parameters['name'] = $obj->name;
             $parameters['description'] = $obj->description;
-            $parameters['image'] = $obj->image;
+            //$parameters['image'] = $obj->image;
             $parameters['id_user'] = $obj->id_user;
             $where = $this->primaryKey."=".$obj->id; 
+            $res = NULL;
             if (!$this->db->transactionOpen) {
                 if ($obj->id != NULL) {
                     $res = $this->update($parameters, $where);
@@ -99,7 +111,6 @@ class AlbumService {
                     $res = $this->insert($parameters);
                     $obj->id = $res;
                 }
-                return $res;
             } else {
                 $this->db->begin();
                 if ($obj->id != NULL) {
@@ -109,8 +120,14 @@ class AlbumService {
                     $obj->id = $res;
                 }
                 $this->db->commit();
-                return $res;
             }
+            if ($obj->image != NULL) {            	
+            	$stmt = $this->db->prepare("UPDATE $this->table SET image=? WHERE $this->primaryKey=?");
+            	$stmt->bindParam(1, $obj->image, PDO::PARAM_LOB);    
+            	$stmt->bindParam(2, $obj->id);
+	            $stmt->execute();	
+            }            
+	        return $res;
         }
         return false;
     }

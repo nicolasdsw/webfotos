@@ -90,13 +90,27 @@ class AlbumController {
                 echo"Você não realizou o upload de forma satisfatória.";
             } */ 
             
-            $check = getimagesize($_FILES["image"]["tmp_name"]);
-            if($check !== false){
-                $image = $_FILES['image']['tmp_name'];
-                $imgContent = addslashes(file_get_contents($image));
-                $tamanhoImg = filesize($image);
-                $obj->image = $imgContent;
-            }
+//             $check = getimagesize($_FILES["image"]["tmp_name"]);
+//             if($check !== false){
+//                 $image = $_FILES['image']['tmp_name'];
+//                 $imgContent = addslashes(file_get_contents($image));
+//                 $tamanhoImg = filesize($image);
+//                 $obj->image = $imgContent;
+//             }
+
+            $arquivo = $_FILES["image"]["tmp_name"];
+            $tamanho = $_FILES["image"]["size"];
+            $tipo    = $_FILES["image"]["type"];
+            $nome  	 = $_FILES["image"]["name"];
+            $conteudo = NULL;
+            if ( $arquivo != "none" ) {
+            	$fp = fopen($arquivo, "rb");
+            	$conteudo = fread($fp, $tamanho);
+            	$conteudo = addslashes($conteudo);
+           	 	fclose($fp); 
+            }	
+            $obj->image = $conteudo;
+           
             try {
                 $res = $this->service->save($obj);
                 echo "<br>";
