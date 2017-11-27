@@ -2,14 +2,14 @@
 class Upload {
 	public $id;
 	public $file;
-	public $subtitle;
+	public $file_type;
 	public $id_album;
 
 	public function __construct($row) {
 		if ($row != NULL) {
 	    	$this->id 	= $row['id_upload'];
 	    	$this->file = $row['file'];
-	    	$this->subtitle = $row['subtitle'];
+	    	$this->file_type = $row['file_type'];
 	    	$this->id_album = $row['id_album'];
 		}  
 	}

@@ -1,3 +1,7 @@
+h1 {
+	text-align: center;
+}
+
 table.mytable {
     width: 100%;
 }
@@ -25,4 +29,36 @@ a, a:hover, a:active, a:visited {
 #loginPage {
 	text-align: center;
 	margin: auto;
+}
+
+.capa-album {
+	display: inline-block;
+	height: 250px;
+	max-width: 350px;
+	text-align: center;
+}
+
+#capa {
+	display: inline-block;
+	vertical-align: top;
+}
+
+#album-form {
+	display: inline-block;
+}
+
+#album-imagens>div {
+	display: inline-block;
+	height: 250px;
+	max-width: 350px;
+	text-align: right;
+	
+}
+
+#album-imagens>div>label {
+	display: block;	
+}
+
+#excluir-imagens-selecionadas {
+	display: inline-block;
 }

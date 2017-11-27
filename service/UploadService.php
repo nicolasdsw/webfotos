@@ -1,49 +1,26 @@
 <?php
 require_once 'db/DBconfig.php';
 require_once 'service/ValidationException.php';
-require_once 'service/UploadService.php';
-require_once 'model/Album.php';
+require_once 'model/Upload.php';
 require_once 'utils/IfUtils.php';
 
-class AlbumService {
+class UploadService {
     
     private $db;
-    private $table = "albums";
-    private $model = "Album";
-    private $primaryKey = "id_album";
-    private $uploadService = NULL;
+    private $table = "uploads";
+    private $model = "Upload";
+    private $primaryKey = "id_upload";
     
     public function __construct() {
         $DBConfig = new DBConfig();
-        $this->db = $DBConfig->getDB();        
-        $this->uploadService = new UploadService();
+        $this->db = $DBConfig->getDB();
     }
 
     public function getAll($order, $direction) {
         $userId = $_SESSION["user_id"];
         return $this->getByUserId($userId, $order, $direction);
     }
-
-    public function getByUserId($userId, $order, $direction) {
-        try {
-            if (!isset($order) || $order == NULL) {
-                $order = $this->primaryKey;
-            }
-            if ( !isset($direction) ) {
-                $direction = "ASC";
-            }
-            $list = array();
-            $res = $this->db->preparedQuery("SELECT * FROM $this->table WHERE id_user=? ORDER BY $order $direction;", array($userId));
-            foreach ($res as $row) {
-                $obj = new $this->model($row);
-                array_push($list, $obj);
-            }
-            return $list;
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
+    
     public function getById($id) {
         try {
             $parameters = array();
@@ -53,13 +30,65 @@ class AlbumService {
             foreach ($res as $row) {
                 $obj = new $this->model($row);
             }
-            if ($obj != NULL) {
-                $obj->uploads = $this->uploadService->getByAlbumId($obj->id, NULL, NULL);                
-            }
             return $obj;
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    public function getByAlbumId($albumId, $order, $direction) {
+        try {
+            if (!isset($order) || $order == NULL) {
+                $order = $this->primaryKey;
+            }
+            if ( !isset($direction) ) {
+                $direction = "ASC";
+            }
+            $list = array();
+            $res = $this->db->preparedQuery("SELECT * FROM $this->table WHERE id_album=? ORDER BY $order $direction;", array($albumId));
+            foreach ($res as $row) {
+                $obj = new $this->model($row);
+                array_push($list, $obj);
+            }
+            return $list;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+    
+    public function addUploads($uploadsList) {
+        $this->db->begin();
+        try {            
+            foreach($uploadsList as $obj) {
+                $this->save($obj);
+            }
+            $this->db->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->db->rollback();
+            throw $e;
+        }
+        return false;
+    }
+
+    public function deleteUploads($uploadsIds) {
+        $checked_count = count($uploadsIds);
+        if ($checked_count > 0) {
+            $this->db->begin();        
+            try {
+                foreach($uploadsIds as $uploadId) {
+                    if ( $uploadId ) {
+                        $this->delete($uploadId);
+                    }
+                }
+                $this->db->commit();
+                return true;
+            } catch (Exception $e) {
+                $this->db->rollback();
+                throw $e;
+            }
+        }
+        return false;
     }
 
     public function delete( $id ) {
@@ -79,15 +108,13 @@ class AlbumService {
         }
     }
     
-    public function getImage( $albumId ) {        
-        $name = null;
+    public function getImage( $uploadId ) {        
         $lob = null;
         $image_type = null;
-    	$stmt = $this->db->prepare("SELECT name, image, image_type from ".$this->table." where ".$this->primaryKey."=?");
-    	$stmt->execute(array($albumId));
-    	$stmt->bindColumn(1, $name, PDO::PARAM_STR, 256);
-    	$stmt->bindColumn(2, $lob, PDO::PARAM_LOB);
-    	$stmt->bindColumn(3, $type, PDO::PARAM_STR, 256);
+    	$stmt = $this->db->prepare("SELECT file, file_type from ".$this->table." where ".$this->primaryKey."=?");
+    	$stmt->execute(array($uploadId));
+    	$stmt->bindColumn(1, $lob, PDO::PARAM_LOB);
+    	$stmt->bindColumn(2, $type, PDO::PARAM_STR, 256);
     	$stmt->fetch(PDO::FETCH_BOUND);    	
     	header("Content-type: $type");
     	if (is_string($lob)) {   	    
@@ -101,9 +128,9 @@ class AlbumService {
         if ($obj != NULL ) {
             $this->beforeSave($obj); 
             $parameters = array();
-            $parameters['name'] = $obj->name;
-            $parameters['description'] = $obj->description;
-            $parameters['id_user'] = $obj->id_user;
+            $parameters['file'] = $obj->file;
+            $parameters['file_type'] = $obj->file_type;
+            $parameters['id_album'] = $obj->id_album;
             $where = $this->primaryKey."=".$obj->id; 
             $res = NULL;
             if (!$this->db->transactionOpen) {
@@ -122,20 +149,7 @@ class AlbumService {
                     $obj->id = $res;
                 }
                 $this->db->commit();
-            }
-            
-            $pathToFile = $obj->imageTemp['tmp_name'];
-            if ($pathToFile != NULL) {                
-                $nome = $obj->imageTemp["name"];
-                $tamanho = $obj->imageTemp["size"];
-                $tipo    = $obj->imageTemp["type"];
-                $conteudo = file_get_contents($pathToFile);
-                $stmt = $this->db->prepare("UPDATE $this->table SET image=:image, image_type=:tipo WHERE $this->primaryKey=:id;");
-                $stmt->bindParam(':image', $conteudo, PDO::PARAM_LOB);    
-                $stmt->bindParam(':tipo', $tipo, PDO::PARAM_STR, 256);    
-            	$stmt->bindParam(':id', $obj->id);
-	            $stmt->execute();	
-            }            
+            } 
 	        return $res;
         }
         return false;
@@ -175,36 +189,18 @@ class AlbumService {
         if ( !isset($obj) || $obj == NULL ) {
             $errors[] = 'Objeto não definido';
         }
-        if (isEmpty($obj->name)) {
-            $errors[] = 'Campo nome deve ser informado';
-        }
-
-        $pathToFile = $obj->imageTemp['tmp_name'];
-        if ($pathToFile != NULL) {
-            $file_type = $obj->imageTemp["type"];
+        
+        if ($obj->file_type != NULL) {
             $allowed = array("image/jpeg", "image/gif", "image/png");
-            if(!in_array($file_type, $allowed)) {
-                $errors[] = 'Apenas jpg, gif, and png são permitidos na capa do álbum.';
-            }           
+            if(!in_array($obj->file_type, $allowed)) {
+                $errors[] = 'Apenas arquivos dos tipos jpg, gif, and png são permitidos.';
+            }
         }
-
-        $obj->id_user = $_SESSION["user_id"];
+        
         if ( empty($errors) ) {
             return;
         }
         throw new ValidationException($errors);
-    }
-    
-    public function addUploads($uploadsList) {
-        return $this->uploadService->addUploads($uploadsList);
-    }
-
-    public function deleteUpload($id) {
-        return $this->uploadService->delete($id);
-    }
-
-    public function deleteUploads($uploadsIds) {
-        $this->uploadService->deleteUploads($uploadsIds);
     }
 }
 ?>

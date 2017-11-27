@@ -30,7 +30,8 @@ CREATE TABLE albums
 CREATE TABLE uploads
 (
 	id_upload bigint NOT NULL AUTO_INCREMENT,
-	file blob NOT NULL,
+	file longblob NOT NULL,
+	file_type varchar(20) NOT NULL,
 	subtitle varchar(255),
 	id_album bigint NOT NULL,
 	PRIMARY KEY (id_upload)

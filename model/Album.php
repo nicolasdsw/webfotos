@@ -7,6 +7,7 @@ class Album {
 	public $image_type;
 	public $imageTemp;
 	public $id_user;
+	public $uploads;
 
 	public function __construct($row) {
 		if ($row != NULL) {

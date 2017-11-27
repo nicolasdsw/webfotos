@@ -4,7 +4,7 @@
          <link rel="stylesheet" type="text/css" href="view/style.css">
     </head>
     <body>
-        <h1>WEB FOTOS!</h2>
+        <h1>WEB FOTOS</h2>
         <header style="margin-left: 6%; margin-right: 6%;">
             <?php 
             session_start();
@@ -13,9 +13,9 @@
             
             if (isset($_SESSION["login"])) { ?>
                 <h3>MENUS - Selecione uma das opções:</h3>
-                <input type="button" value="Cadastro de Usuários" onClick="self.location='index.php?menu=usuarios'" />
+                <input type="button" value="Gerenciar Usuários" onClick="self.location='index.php?menu=usuarios'" />
                 &nbsp
-                <input type="button" value="Gerenciar Albuns" onClick="self.location='index.php?menu=albuns'" />
+                <input type="button" value="Gerenciar Álbuns" onClick="self.location='index.php?menu=albuns'" />
                 &nbsp
                 <input type="button" value="Sair (Logout)" onClick="self.location='index.php?menu=login&op=logout'" />
             <?php 
