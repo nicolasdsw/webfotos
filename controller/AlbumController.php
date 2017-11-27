@@ -24,7 +24,7 @@ class AlbumController {
             if ( !$op ) {
                 $this->listar();
             } else if ( $op == 'new' ) {
-                $this->new();
+                $this->newAlbum();
             } else if ( $op == 'show' ) {
                 $this->show();
             } else if ( $op == 'save' ) {
@@ -58,7 +58,7 @@ class AlbumController {
         include $this->view.'/albums.php';        
     }   
 
-    public function new() {
+    public function newAlbum() {
         $errors = array();
         $menu = $this->menu;
         $title = 'Cadastrar Álbum';
