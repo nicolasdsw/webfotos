@@ -108,7 +108,7 @@ class UploadService {
         }
     }
     
-    public function getImage( $uploadId ) {        
+    private function getImage( $uploadId ) {        
         $lob = null;
         $image_type = null;
     	$stmt = $this->db->prepare("SELECT file, file_type from ".$this->table." where ".$this->primaryKey."=?");

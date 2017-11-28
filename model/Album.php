@@ -5,7 +5,6 @@ class Album {
 	public $description;
 	public $image;
 	public $image_type;
-	public $imageTemp;
 	public $id_user;
 	public $uploads;
 
@@ -15,6 +14,7 @@ class Album {
 	    	$this->name = $row['name'];
 	    	$this->description = $row['description'];
 	    	$this->image = $row['image'];
+	    	$this->image_type = $row['image_type'];
 	    	$this->id_user = $row['id_user'];
 		}  
 	}

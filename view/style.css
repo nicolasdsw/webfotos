@@ -38,6 +38,11 @@ a, a:hover, a:active, a:visited {
 	text-align: center;
 }
 
+.img-item {
+	height: 200px;
+	width: 340px;
+}
+
 #capa {
 	display: inline-block;
 	vertical-align: top;

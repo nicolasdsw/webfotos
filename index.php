@@ -13,14 +13,16 @@
             
             if (isset($_SESSION["login"])) { ?>
                 <h3>MENUS - Selecione uma das opções:</h3>
-                <input type="button" value="Gerenciar Usuários" onClick="self.location='index.php?menu=usuarios'" />
-                &nbsp
+                <?php if ($_SESSION["admin"]) { ?>
+                    <input type="button" value="Gerenciar Usuários" onClick="self.location='index.php?menu=usuarios'" />
+                	&nbsp
+               	<?php } ?>
                 <input type="button" value="Gerenciar Álbuns" onClick="self.location='index.php?menu=albuns'" />
                 &nbsp
                 <input type="button" value="Sair (Logout)" onClick="self.location='index.php?menu=login&op=logout'" />
             <?php 
                 $usuarioLogin = $_SESSION["login"];
-                echo "<br>Olá, ".$usuarioLogin;
+                echo "<br><h4>Olá, ".$usuarioLogin."</h4>";
             }
             ?>
         </header>
@@ -32,12 +34,15 @@
                     $controller = new ValidaDatabaseController();
                    try {
                        $controller->validaDB();
-                       $menu = "login";
-                   } catch (Exception $e) {
+                    } catch (Exception $e) {
                        echo "Verifique o usuário, a senha e o endereço de acesso do banco de dados em db/DBconfig.php <br>";
                        print htmlentities($e->getMessage());
                    }           
                 }
+                if (!isset($_SESSION["login"])) {
+                    $menu = "login";                    
+                }
+                
                 if ( $menu == NULL) {
                    
                 } elseif ( $menu == 'login' ) {

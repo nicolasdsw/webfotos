@@ -10,8 +10,8 @@ if ( $errors ) {
 ?>
 <div id="capa">
     <?php
-    if ($obj->id != NULL) {
-        echo '<img style="height: 200px;" src="albumGetImage.php?album-id=' . $obj->id . '"/>';
+    if ($obj->image != NULL) {
+        echo '<img class="img-item" src="data:'.$obj->image_type.';base64,'. base64_encode($obj->image). '" />';
     }
     ?>
 </div>
@@ -26,7 +26,7 @@ if ( $errors ) {
         <textarea name="description"><?php print htmlentities($obj->description) ?></textarea>
         <br/>
         <br/>
-        <label for="image">Capa do Álbum:</label>
+        <label for="image">Alterar Capa do Álbum:</label>
     	<input type="file" name="fileUpload"/><br>
         <br>       	    
         <input type="hidden" name="form-submitted" value="1" />
@@ -48,7 +48,9 @@ Total de imagens: <?php print count($lista); ?>
             	<div>
             		<?php if ($item->id != NULL) {
             		    echo '<input type="checkbox" name="uploadsIds[]" value="'.$item->id.'" name="img'.$item->id.'" id="img'.$item->id.'" />';
-                        echo '<label for="img'.$item->id.'"><img style="height: 200px;" src="getImage.php?upload-id='.$item->id.'"/></label>';
+                        echo '<label for="img'.$item->id.'">';
+                        echo '<img class="img-item" src="data:'.$item->file_type.';base64,'. base64_encode($item->file). '" />';
+                        echo '</label>';
                         echo '<span><a href="?menu='.$menu.'&op=delete-upload&album-id='.$obj->id.'&upload-id='.$item->id.'">Excluir</a></span>';
             	    } ?>
             	</div>

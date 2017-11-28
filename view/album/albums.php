@@ -17,7 +17,7 @@ Total de álbuns: <?php print count($lista); ?>
 	   		<a href="?menu=<?php echo $menu ?>&op=show&id=<?php print $item->id; ?>">
         	<div>
         		<?php if ($item->id != NULL) {
-                    echo '<img style="height: 200px;" src="albumGetImage.php?album-id='.$item->id.'"/>';
+        		    echo '<img class="img-item" src="data:'.$item->image_type.';base64,'. base64_encode($item->image). '" />';
         	    } ?>
         	</div>
 	        </a>

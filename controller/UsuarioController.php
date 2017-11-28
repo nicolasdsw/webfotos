@@ -69,6 +69,7 @@ class UsuarioController {
             $obj->id    = isset($_POST['id'])      ?   $_POST['id']  : NULL;          
             $obj->login = isset($_POST['login'])   ?   $_POST['login'] : NULL;
             $obj->email = isset($_POST['email'])   ?   $_POST['email'] : NULL;
+            $obj->superuser = isset($_POST['superuser']);
             $obj->password = isset($_POST['password'])   ?   $_POST['password'] : NULL;
             $obj->salvarSenha = isset($_POST['salvarSenha']);
             $obj->novaSenha = isset($_POST['novaSenha'])   ?   $_POST['novaSenha'] : NULL;

@@ -79,7 +79,7 @@ class AlbumService {
         }
     }
     
-    public function getImage( $albumId ) {        
+    private function getImage( $albumId ) {        
         $name = null;
         $lob = null;
         $image_type = null;
@@ -103,6 +103,8 @@ class AlbumService {
             $parameters = array();
             $parameters['name'] = $obj->name;
             $parameters['description'] = $obj->description;
+            $parameters['image'] = $obj->image;
+            $parameters['image_type'] = $obj->image_type;
             $parameters['id_user'] = $obj->id_user;
             $where = $this->primaryKey."=".$obj->id; 
             $res = NULL;
@@ -123,19 +125,6 @@ class AlbumService {
                 }
                 $this->db->commit();
             }
-            
-            $pathToFile = $obj->imageTemp['tmp_name'];
-            if ($pathToFile != NULL) {                
-                $nome = $obj->imageTemp["name"];
-                $tamanho = $obj->imageTemp["size"];
-                $tipo    = $obj->imageTemp["type"];
-                $conteudo = file_get_contents($pathToFile);
-                $stmt = $this->db->prepare("UPDATE $this->table SET image=:image, image_type=:tipo WHERE $this->primaryKey=:id;");
-                $stmt->bindParam(':image', $conteudo, PDO::PARAM_LOB);    
-                $stmt->bindParam(':tipo', $tipo, PDO::PARAM_STR, 256);    
-            	$stmt->bindParam(':id', $obj->id);
-	            $stmt->execute();	
-            }            
 	        return $res;
         }
         return false;
@@ -179,15 +168,13 @@ class AlbumService {
             $errors[] = 'Campo nome deve ser informado';
         }
 
-        $pathToFile = $obj->imageTemp['tmp_name'];
-        if ($pathToFile != NULL) {
-            $file_type = $obj->imageTemp["type"];
+        if ($obj->image_type != NULL) {
             $allowed = array("image/jpeg", "image/gif", "image/png");
-            if(!in_array($file_type, $allowed)) {
-                $errors[] = 'Apenas jpg, gif, and png são permitidos na capa do álbum.';
-            }           
-        }
-
+            if(!in_array($obj->image_type, $allowed)) {
+                $errors[] = 'Apenas arquivos dos tipos jpg, gif, and png são permitidos.';
+            }
+        }        
+        
         $obj->id_user = $_SESSION["user_id"];
         if ( empty($errors) ) {
             return;

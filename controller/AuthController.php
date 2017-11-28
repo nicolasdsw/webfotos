@@ -25,6 +25,7 @@ class AuthController {
             } else if ( $op == 'logout' ) {
                 session_destroy();
                 unset($_SESSION["login"]);
+                unset($_SESSION["admin"]);
                 unset($_SESSION["user_id"]);
                 header("location: index.php");
             } else {
@@ -50,6 +51,7 @@ class AuthController {
                 $usuario = $this->service->getByLoginAndSenha($login, $password);
                 if ($usuario != NULL) {
                     $_SESSION["login"] = $usuario->login;
+                    $_SESSION["admin"] = $usuario->superuser;
                     $_SESSION["user_id"] = $usuario->id;
                     header("location: index.php");
                 }

@@ -18,6 +18,10 @@ if ( $errors ) {
     <input type="text" name="email" value="<?php print htmlentities($obj->email) ?>"/>
     <br/>
     <br/>
+    <label for="superuser">Usuário administrador:</label>
+    <input type="checkbox" name="superuser" <?php if (htmlentities($obj->superuser)) { echo 'checked';} ?> />   
+    <br/>
+    <br/>
     <label for="salvarSenha">Alterar a Senha:</label>
     <input type="checkbox" onClick="exibeCampoSenha()" name="salvarSenha" value="<?php print htmlentities($obj->salvarSenha) ?>" />   
     <br/>

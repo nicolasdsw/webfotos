@@ -104,10 +104,16 @@ class AlbumController {
         //Verifica se o botão salvar do formulário foi clicado
         $errors = array();
         if ( isset($_POST['form-submitted']) ) {
-            $obj->id    = isset($_POST['id'])      ?   $_POST['id']  : NULL;
+            $id = isset($_POST['id'])      ?   $_POST['id']  : NULL;
+            $obj = $this->service->getById($id);            
             $obj->name = isset($_POST['name'])   ?   $_POST['name'] : NULL;
-            $obj->description = isset($_POST['description'])   ?   $_POST['description'] : NULL;
-            $obj->imageTemp = $_FILES["fileUpload"];
+            $obj->description = isset($_POST['description'])   ?   $_POST['description'] : NULL;           
+            $imgs = $_FILES['fileUpload'];
+            print $imgs;
+            if(!empty($imgs) && $imgs['tmp_name'] != NULL) {
+                $obj->image = file_get_contents($imgs['tmp_name']);
+                $obj->image_type = $imgs['type'];
+            }
             try {
                 $res = $this->service->save($obj);
                 echo "<br>";
