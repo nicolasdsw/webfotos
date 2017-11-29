@@ -66,6 +66,21 @@ class UsuarioService {
         }
     }
 
+    public function getByEmail($email) {
+        try {
+            $parameters = array();
+            array_push($parameters, $email);
+            $res = $this->db->preparedQuery("SELECT * FROM $this->table WHERE email=?", $parameters);
+            $obj = NULL;
+            foreach ($res as $row) {
+                $obj = new $this->model($row);
+            }
+            return $obj;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
     public function delete( $id ) {
         try {
             $obj = $this->getById($id);
@@ -155,6 +170,9 @@ class UsuarioService {
         if (isEmpty($obj->login)) {
             $errors[] = 'Campo login deve ser informado';
         }
+        if (isEmpty($obj->email)) {
+            $errors[] = 'Campo e-mail deve ser informado';
+        }
         if ($obj->salvarSenha) {
             if (isEmpty($obj->novaSenha)) {
                 $errors[] = 'Campo senha deve ser informado';
@@ -172,6 +190,11 @@ class UsuarioService {
         $res0 = $this->getByLogin($obj->login);
         if ($res0 != NULL && $res0->id != $obj->id) {
             $errors[] = 'Erro: o nome de usuário (login) já foi cadastrado!';
+        }
+
+        $res1 = $this->getByEmail($obj->email);
+        if ($res1 != NULL && $res1->id != $obj->id) {
+            $errors[] = 'Erro: o email do usuário já foi cadastrado!';
         }
 
         if ( empty($errors) ) {

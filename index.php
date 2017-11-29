@@ -39,21 +39,22 @@
                        print htmlentities($e->getMessage());
                    }           
                 }
+                
                 if (!isset($_SESSION["login"])) {
-                    $menu = "login";                    
+                    if ( $menu == 'novo-usuario' ) {
+                        require_once 'controller/NovoUsuarioController.php';
+                        $controller = new NovoUsuarioController();
+                        $controller->handleRequest();
+                    } else {
+                        $menu = "login";                        
+                    }
                 }
                 
-                if ( $menu == NULL) {
-                   
-                } elseif ( $menu == 'login' ) {
+                if ( $menu == 'login' ) {
                     require_once 'controller/AuthController.php';
                     $controller = new AuthController();
                     $controller->handleRequest();
-                } elseif ( $menu == 'novo-usuario' ) {
-                    require_once 'controller/NovoUsuarioController.php';
-                    $controller = new NovoUsuarioController();
-                    $controller->handleRequest();
-                } elseif ( $menu == 'usuarios' ) {
+                } elseif ( $menu == 'usuarios' && $_SESSION["admin"]) {
                     require_once 'controller/UsuarioController.php';
                     $controller = new UsuarioController();
                     $controller->handleRequest();
@@ -61,8 +62,6 @@
                     require_once 'controller/AlbumController.php';
                     $controller = new AlbumController();
                     $controller->handleRequest();
-                } else {
-                    echo "Page not found ".$menu." was not found!";
                 }
             } catch ( Exception $e ) {
                 print htmlentities($e->getMessage());
